@@ -21,7 +21,5 @@ services:
       - GITHUB_REPO=${GITHUB_REPO:-fragmc.github.io}
       - GITHUB_BRANCH=${GITHUB_BRANCH:-main}
       - ICEDSPEAR_JSON_PATH=${ICEDSPEAR_JSON_PATH:-icedspear.json}
-      - DROPBOX_APP_KEY=${DROPBOX_APP_KEY}
-      - DROPBOX_APP_SECRET=${DROPBOX_APP_SECRET}
     volumes:
       - ./data:/app/data
