@@ -6,7 +6,7 @@ import { createTranscript } from 'discord-html-transcripts';
 import fs from 'fs';
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
+  intents: [GatewayIntentBits.Guilds],
   partials: [Partials.Channel],
 });
 
