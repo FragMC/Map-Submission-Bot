@@ -1,10 +1,27 @@
 version: '3.8'
 services:
   mapbot:
-    build: .
+    image: ghcr.io/fragmc/map-submission-bot:latest
     container_name: fragmc-mapbot
     restart: unless-stopped
+    # Pulls pre-built image from GHCR - no local build needed
+    # To build locally instead, replace image with build: .
     env_file:
       - .env
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - GUILD_ID=${GUILD_ID}
+      - DISCORD_CLIENT_ID=${DISCORD_CLIENT_ID}
+      - EMBED_CHANNEL_ID=${EMBED_CHANNEL_ID}
+      - OPEN_TICKETS_CATEGORY_ID=${OPEN_TICKETS_CATEGORY_ID}
+      - CLOSED_TICKETS_CATEGORY_ID=${CLOSED_TICKETS_CATEGORY_ID}
+      - TRANSCRIPTS_CHANNEL_ID=${TRANSCRIPTS_CHANNEL_ID}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - GITHUB_OWNER=${GITHUB_OWNER:-FragMC}
+      - GITHUB_REPO=${GITHUB_REPO:-fragmc.github.io}
+      - GITHUB_BRANCH=${GITHUB_BRANCH:-main}
+      - ICEDSPEAR_JSON_PATH=${ICEDSPEAR_JSON_PATH:-icedspear.json}
+      - DROPBOX_APP_KEY=${DROPBOX_APP_KEY}
+      - DROPBOX_APP_SECRET=${DROPBOX_APP_SECRET}
     volumes:
       - ./data:/app/data
