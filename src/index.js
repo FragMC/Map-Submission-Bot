@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, Partials, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, ChannelType, PermissionFlagsBits, Events } from 'discord.js';
+import { Client, GatewayIntentBits, Partials, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, ChannelType, PermissionFlagsBits, Events, REST, Routes, SlashCommandBuilder } from 'discord.js';
 import { config } from './config.js';
 import { getNextTicketNumber, saveTicket, getTicket, deleteTicket, updateTicketChannelId } from './utils/tickets.js';
 import { addMapToIcedSpear, editMapInIcedSpear, addImagesToMap, removeImagesFromMap } from './utils/github.js';
@@ -49,6 +49,21 @@ client.once(Events.ClientReady, async () => {
   await ensureEmbed();
   // Ensure data dir exists
   fs.mkdirSync('./data', { recursive: true });
+  // Auto-register slash commands so they appear as suggestions
+  try {
+    const commands = [
+      new SlashCommandBuilder().setName('map-submit').setDescription('Submit the map from this ticket to the website (admin only)').toJSON(),
+      new SlashCommandBuilder().setName('map-edit').setDescription('Edit map difficulty/verified status').addStringOption(o => o.setName('id').setDescription('Map ID').setRequired(true)).addStringOption(o => o.setName('difficulty').setDescription('Difficulty (e.g. Easy, Medium, Hard)').setRequired(false)).addBooleanOption(o => o.setName('verified').setDescription('Verified').setRequired(false)).addBooleanOption(o => o.setName('verified_no_cp').setDescription('Verified No Checkpoints').setRequired(false)).toJSON(),
+      new SlashCommandBuilder().setName('map-images').setDescription('Add or delete images for a map').addStringOption(o => o.setName('action').setDescription('add or delete').setRequired(true).addChoices({ name: 'add', value: 'add' }, { name: 'delete', value: 'delete' })).addStringOption(o => o.setName('id').setDescription('Map ID').setRequired(true)).addStringOption(o => o.setName('image_url').setDescription('Image URL (for add via URL)').setRequired(false)).addAttachmentOption(o => o.setName('image').setDescription('Image file (for add via upload)').setRequired(false)).toJSON(),
+    ];
+    const rest = new REST({ version: '10' }).setToken(config.discordToken);
+    const clientId = client.user.id;
+    console.log(`[Commands] Registering ${commands.length} slash commands to guild ${config.guildId}...`);
+    await rest.put(Routes.applicationGuildCommands(clientId, config.guildId), { body: commands });
+    console.log(`[Commands] Registered ${commands.length} commands - they will appear as suggestions when typing /`);
+  } catch (e) {
+    console.warn(`[Commands] Failed to auto-register: ${e.message} - run npm run deploy-commands manually with DISCORD_CLIENT_ID set`);
+  }
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
