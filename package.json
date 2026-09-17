@@ -1,0 +1,22 @@
+{
+  "name": "fragmc-mapbot",
+  "version": "2.0.6-alpha",
+  "description": "FragMC Map Submission Bot - Ticket system for map submissions and reports, separate from IcedSpear",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "deploy-commands": "node src/deploy-commands.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "discord-html-transcripts": "^3.2.0",
+    "octokit": "^3.1.2",
+    "@octokit/rest": "^20.0.2",
+    "dotenv": "^16.3.1"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

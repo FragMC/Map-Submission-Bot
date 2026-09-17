@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  mapbot:
+    build: .
+    container_name: fragmc-mapbot
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
