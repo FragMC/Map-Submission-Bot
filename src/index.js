@@ -31,10 +31,19 @@ async function ensureEmbed() {
       console.warn('[Embed] EMBED_CHANNEL_ID not found or not text');
       return;
     }
-    const messages = await channel.messages.fetch({ limit: 10 });
+    // Fetch up to 50 messages to avoid duplicate if channel has >10 messages from other bots
+    const messages = await channel.messages.fetch({ limit: 50 });
     const hasEmbed = messages.some(m => m.author.id === client.user.id && m.embeds.some(e => e.title === 'Submit a map'));
     if (!hasEmbed) {
-      await channel.send(buildMainEmbed());
+      // Also check pinned messages
+      const pinned = await channel.messages.fetchPinned().catch(() => new Map());
+      const hasPinned = [...pinned.values()].some(m => m.embeds.some(e => e.title === 'Submit a map'));
+      if (hasPinned) {
+        console.log('[Embed] Already pinned in', config.embedChannelId);
+        return;
+      }
+      const msg = await channel.send(buildMainEmbed());
+      try { await msg.pin(); } catch {}
       console.log('[Embed] Posted Submit/Report embed to', config.embedChannelId);
     } else {
       console.log('[Embed] Already exists in', config.embedChannelId);

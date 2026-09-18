@@ -1,20 +1,31 @@
 import fs from 'fs';
 import path from 'path';
+import { lockSync, unlockSync } from 'proper-lockfile';
 
 const dataPath = './data/tickets.json';
 
 function loadData() {
   try {
-    if (!fs.existsSync(dataPath)) return { mapCounter: 0, reportCounter: 0, tickets: {} };
-    return JSON.parse(fs.readFileSync(dataPath, 'utf-8'));
+    fs.mkdirSync(path.dirname(dataPath), { recursive: true });
+    if (!fs.existsSync(dataPath)) {
+      fs.writeFileSync(dataPath, JSON.stringify({ mapCounter: 0, reportCounter: 0, tickets: {} }, null, 2));
+    }
+    // Use lockfile to prevent race on concurrent Submit (two users at same time)
+    try { lockSync(dataPath, { retries: { retries: 5, minTimeout: 10 } }); } catch {}
+    const content = fs.readFileSync(dataPath, 'utf-8');
+    try { unlockSync(dataPath); } catch {}
+    return JSON.parse(content);
   } catch {
+    try { unlockSync(dataPath); } catch {}
     return { mapCounter: 0, reportCounter: 0, tickets: {} };
   }
 }
 
 function saveData(data) {
   fs.mkdirSync(path.dirname(dataPath), { recursive: true });
+  try { lockSync(dataPath, { retries: { retries: 5, minTimeout: 10 } }); } catch {}
   fs.writeFileSync(dataPath, JSON.stringify(data, null, 2));
+  try { unlockSync(dataPath); } catch {}
 }
 
 export function getNextTicketNumber(type) {
