@@ -1,6 +1,6 @@
 {
   "name": "fragmc-mapbot",
-  "version": "2.0.10-alpha",
+  "version": "2.0.11-alpha",
   "description": "FragMC Map Submission Bot - Ticket system for map submissions and reports, separate from IcedSpear",
   "main": "src/index.js",
   "type": "module",
